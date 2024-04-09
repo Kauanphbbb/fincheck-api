@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { BankAccountsRepository } from 'src/shared/database/repositories/bank-accounts.repositories';
 import { CreateBankAccountDto } from '../dto/create-bank-account.dto';
 import { UpdateBankAccountDto } from '../dto/update-bank-account.dto';
-import { BankAccountsRepository } from 'src/shared/database/repositories/bank-accounts.repositories';
-import { ValidateBankAccountOwnershipService } from './validate-bank-account-ownership.service';
 import { BankAccount } from '../entities/BankAccount';
+import { ValidateBankAccountOwnershipService } from './validate-bank-account-ownership.service';
 
 @Injectable()
 export class BankAccountsService {
@@ -26,7 +26,7 @@ export class BankAccountsService {
   }
 
   async findAllByUserId(userId: string) {
-    const bankAccountsDB = await this.bankAccountsRepo.findMany({
+    const bankAccounts = (await this.bankAccountsRepo.findMany({
       where: {
         userId,
       },
@@ -39,9 +39,7 @@ export class BankAccountsService {
           },
         },
       },
-    });
-
-    const bankAccounts = bankAccountsDB as BankAccount[];
+    })) as BankAccount[];
 
     return bankAccounts.map(({ transactions, ...bankAccounts }) => {
       const totalBalance = transactions.reduce(
