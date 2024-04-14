@@ -13,4 +13,8 @@ export class CategoriesRepository {
   findFirst(findFirstDto: Prisma.CategoryFindFirstArgs) {
     return this.prismaService.category.findFirst(findFirstDto);
   }
+
+  findUnique(findUniqueDto: Prisma.CategoryFindUniqueArgs) {
+    return this.prismaService.category.findUnique(findUniqueDto);
+  }
 }

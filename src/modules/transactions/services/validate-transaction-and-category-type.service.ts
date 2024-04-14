@@ -7,7 +7,7 @@ export class ValidateTransactionAndCategoryType {
   constructor(private readonly categoriesRepo: CategoriesRepository) {}
 
   async validate(transactionType: TransactionType, categoryId: string) {
-    const category = await this.categoriesRepo.findFirst({
+    const category = await this.categoriesRepo.findUnique({
       where: {
         id: categoryId,
       },
