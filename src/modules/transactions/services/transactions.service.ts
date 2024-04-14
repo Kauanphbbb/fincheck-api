@@ -4,8 +4,9 @@ import { ValidateCategoryOwnershipService } from 'src/modules/categories/service
 import { TransactionsRepository } from 'src/shared/database/repositories/transactions.repositories';
 import { CreateTransactionDto } from '../dto/create-transaction.dto';
 import { UpdateTransactionDto } from '../dto/update-transaction.dto';
-import { ValidateTransactionOwnershipService } from './validate-transaction-ownership.service';
 import { TransactionType } from '../entities/transaction';
+import { ValidateTransactionAndCategoryType } from './validate-transaction-and-category-type.service';
+import { ValidateTransactionOwnershipService } from './validate-transaction-ownership.service';
 
 @Injectable()
 export class TransactionsService {
@@ -14,15 +15,19 @@ export class TransactionsService {
     private readonly validateBankAccountOwnershipService: ValidateBankAccountOwnershipService,
     private readonly validateCategoryOwnershipService: ValidateCategoryOwnershipService,
     private readonly validateTransactionOwnershipService: ValidateTransactionOwnershipService,
+    private readonly validateTransactionAndCategoryType: ValidateTransactionAndCategoryType,
   ) {}
   async create(userId: string, createTransactionDto: CreateTransactionDto) {
     const { bankAccountId, categoryId, date, name, type, value } =
       createTransactionDto;
+
     await this.validateEntitiesOwnership({
       userId,
       bankAccountId,
       categoryId,
     });
+
+    await this.validateTransactionAndCategoryType.validate(type, categoryId);
 
     return this.transactionsRepo.create({
       data: {
@@ -67,12 +72,15 @@ export class TransactionsService {
   ) {
     const { bankAccountId, categoryId, date, name, type, value } =
       updateTransactionDto;
+
     await this.validateEntitiesOwnership({
       userId,
       transactionId,
       bankAccountId,
       categoryId,
     });
+
+    await this.validateTransactionAndCategoryType.validate(type, categoryId);
 
     return this.transactionsRepo.update({
       where: {
